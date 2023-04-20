@@ -24,6 +24,12 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
-	ofxTinyMidiSoundFont sound_font_;
+	ofxTinyMidiSoundFont soundFont_;
 	ofxTinyMidiPlayer midi_;
+
+	void setInstrument(int instr);
+	void noteOn(int note);
+	void noteOff(int note);
+
+	string instrName;
 };

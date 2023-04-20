@@ -1,15 +1,12 @@
 #pragma once
 
 #include "ofMain.h"
-
 #include "tsf.h"
-
-//#include <mutex>                    // std::mutex, std::lock_guard
 
 class ofxTinyMidiSoundFont {
 public:
-	void setup(bool useMutex = true); // Disable mutex if you are setting notes and generate audio from the same thread
-	void load(string sf2_file_name);
+	void setup(); 
+	void load(string sf2_file_name, int sampleRate = 44100, float volumeDb = 0);
 
 	void release();	// Free resources
 
@@ -18,12 +15,17 @@ public:
 	void audioOut(ofSoundBuffer& output, int flagMixing = 0);
 
 	// Midi events
+	// When calling midi events from non-audio thread, declare 
+	//    ofxTinyMidiLock lock(soundFont); 
+	// Then inside scope of this "lock" object resources will be locked
 	void channelSetProgram(int channel /*0..15*/, int program);
 	void noteOn(int channel, int key, int velocity /*0..127*/);
 	void noteOff(int channel, int key);
 	void pitchBend(int channel, int pitchBend);
 	void controlChange(int channel, int control, int controlValue);
 
+	// Mutex
+	mutex& mut() { return mutex_; }
 private:
 	bool useMutex_ = true;
 	bool loaded_ = false;
@@ -34,22 +36,16 @@ private:
 
 	mutex mutex_;
 
-	// Conditional locker, enables mutex if required
-	// Works in its visibility area until destroying
-	struct CondLock {
-		CondLock(mutex &mut, bool useMutex) {
-			if (useMutex) {
-				lock_ = new lock_guard<mutex>(mut);
-			}
-		}
-		~CondLock() {
-			if (lock_) {
-				delete lock_;
-			}
-		}
-		lock_guard<mutex>* lock_ = nullptr;
-	};
-
-
 };
 
+
+
+// Conditional locker, enables mutex if required
+// Locks in its visibility area until destroying
+class ofxTinyMidiLock {
+public:
+	ofxTinyMidiLock(mutex& mut): lock_(mut) {}
+	ofxTinyMidiLock(ofxTinyMidiSoundFont& soundFont) : lock_(soundFont.mut()) {}
+private:
+	lock_guard<mutex> lock_;
+};
