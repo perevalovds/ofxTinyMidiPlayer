@@ -41,7 +41,7 @@ void ofxTinyMidiSoundFont::release()
 }
 
 //--------------------------------------------------------------
-string ofxTinyMidiSoundFont::instrumentName(int i)
+string ofxTinyMidiSoundFont::instrumentNameUnsafe(int i)
 {
 	const char* pName = tsf_get_presetname(soundFont_, i);
 	if (pName) return pName;
@@ -61,8 +61,7 @@ void ofxTinyMidiSoundFont::audioOut(ofSoundBuffer& output, int flagMixing)
 		return;
 	}
 
-	auto& buffer = output.getBuffer();
-	if (buffer.empty()) return;
+	if (output.size() == 0) return;
 
 	if (output.getNumChannels() != channels_) {
 		cout << "ofxTinyMidiSoundFont::audioOut error: expected " << channels_ << " channels in the buffer" << endl;
@@ -71,11 +70,11 @@ void ofxTinyMidiSoundFont::audioOut(ofSoundBuffer& output, int flagMixing)
 	}
 
 	int sampleCount = output.size() / channels_;
-	renderFloatNoLock(output.getBuffer().data(), sampleCount, flagMixing);
+	renderFloatUnsafe(output.getBuffer().data(), sampleCount, flagMixing);
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::renderFloatNoLock(float* outputStereo, int nStereoSamples, int flagMixing)
+void ofxTinyMidiSoundFont::renderFloatUnsafe(float* outputStereo, int nStereoSamples, int flagMixing)
 {
 	if (!outputStereo) {
 		cout << "ofxTinyMidiSoundFont::renderFloatNoLock - null outputStereo" << endl;
@@ -93,7 +92,7 @@ void ofxTinyMidiSoundFont::renderFloatNoLock(float* outputStereo, int nStereoSam
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::channelSetProgramNoLock(int channel, int program)
+void ofxTinyMidiSoundFont::channelSetProgramUnsafe(int channel, int program)
 {
 	if (!loaded_) {
 		return;
@@ -103,7 +102,7 @@ void ofxTinyMidiSoundFont::channelSetProgramNoLock(int channel, int program)
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::noteOnNoLock(int channel, int key, int velocity)
+void ofxTinyMidiSoundFont::noteOnUnsafe(int channel, int key, int velocity)
 {
 	if (!loaded_) {
 		return;
@@ -112,7 +111,7 @@ void ofxTinyMidiSoundFont::noteOnNoLock(int channel, int key, int velocity)
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::noteOffNoLock(int channel, int key)
+void ofxTinyMidiSoundFont::noteOffUnsafe(int channel, int key)
 {
 	if (!loaded_) {
 		return;
@@ -121,7 +120,7 @@ void ofxTinyMidiSoundFont::noteOffNoLock(int channel, int key)
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::pitchBendNoLock(int channel, int pitchBendNoLock)
+void ofxTinyMidiSoundFont::pitchBendUnsafe(int channel, int pitchBendNoLock)
 {
 	if (!loaded_) {
 		return;
@@ -130,7 +129,7 @@ void ofxTinyMidiSoundFont::pitchBendNoLock(int channel, int pitchBendNoLock)
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::controlChangeNoLock(int channel, int control, int controlValue)
+void ofxTinyMidiSoundFont::controlChangeUnsafe(int channel, int control, int controlValue)
 {
 	if (!loaded_) {
 		return;
@@ -138,4 +137,14 @@ void ofxTinyMidiSoundFont::controlChangeNoLock(int channel, int control, int con
 	tsf_channel_midi_control(soundFont_, channel, control, controlValue);
 }
 
+//--------------------------------------------------------------
+void ofxTinyMidiSoundFont::stopAllNotes()
+{
+	if (!loaded_) {
+		return;
+	}
+	ofxTinyMidiLock locker(mutex_);
+	tsf_reset(soundFont_);
+
+}
 //--------------------------------------------------------------

@@ -73,7 +73,7 @@ void ofApp::audioOut(ofSoundBuffer& output) {
 	}
 
 	int flagMixing = 0;
-	midiPlayer_.audioOut(output, flagMixing);
+	midiPlayer_.audioOut(output, soundFont_, flagMixing);
 }
 
 //--------------------------------------------------------------

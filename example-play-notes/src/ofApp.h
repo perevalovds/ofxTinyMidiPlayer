@@ -1,5 +1,7 @@
 #pragma once
 
+// Example of playing notes using a sound font. Based on examples of original TinySoundFont lib.
+
 #include "ofMain.h"
 #include "ofxTinyMidiPlayer.h"
 

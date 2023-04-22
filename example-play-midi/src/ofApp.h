@@ -1,5 +1,7 @@
 #pragma once
 
+// Example of playing MIDI file. Based on examples of original TinySoundFont lib.
+
 #include "ofMain.h"
 #include "ofxTinyMidiPlayer.h"
 

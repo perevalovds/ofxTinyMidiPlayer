@@ -90,14 +90,14 @@ void ofApp::draw(){
 		"Press 1..9 to play a note\n"
 		"      q..p to change instrument", 30, 30);
 	
-	ofDrawBitmapString("Instrument: " + ofToString(currentInstrument_) + " - " + soundFont_.instrumentName(currentInstrument_), 30, 100);
+	ofDrawBitmapString("Instrument: " + ofToString(currentInstrument_) + " - " + soundFont_.instrumentNameUnsafe(currentInstrument_), 30, 100);
 }
 
 //--------------------------------------------------------------
 void ofApp::setInstrument(int instr)
 {
 	ofxTinyMidiLock lock(soundFont_);	// Lock resources
-	soundFont_.channelSetProgramNoLock(0, instr);
+	soundFont_.channelSetProgramUnsafe(0, instr);
 	currentInstrument_ = instr;
 }
 
@@ -113,7 +113,7 @@ void ofApp::noteOn(int note)
 		pressedNotes_[note] = 1;
 		ofxTinyMidiLock lock(soundFont_);	// Lock resources
 		int velocity = 100;	// Maximum 127
-		soundFont_.noteOnNoLock(0, note, velocity);
+		soundFont_.noteOnUnsafe(0, note, velocity);
 	}
 }
 
@@ -124,7 +124,7 @@ void ofApp::noteOff(int note)
 	{
 		pressedNotes_[note] = 0;
 		ofxTinyMidiLock lock(soundFont_);	// Lock resources
-		soundFont_.noteOffNoLock(0, note);
+		soundFont_.noteOffUnsafe(0, note);
 	}
 }
 

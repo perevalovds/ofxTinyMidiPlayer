@@ -6,44 +6,47 @@
 class ofxTinyMidiSoundFont {
 public:
 	void load(string sf2_file_name, int sampleRate = 44100, float volumeDb = 0);
+	void release();			// Free resources
+	void stopAllNotes();	// Stopping all notes
+	
+	string instrumentNameUnsafe(int i);
 
-	void release();	// Free resources
+	mutex& mut() { return mutex_; }	// Mutex for locking resources
 
-	string instrumentName(int i);
-
+	//---------------------------------------
+	// Audio
+	//---------------------------------------
 	// Audio callback
+	// Safe - locks resources.
 	// This is higher-level audio generation, with resource locking
 	// To generate with MIDI - use ofxTinyMidiPlayer::audioOut with 
 	// By default mixing if off, it means replacing values in output (if 1 then adding to output)
 	void audioOut(ofSoundBuffer& output, int flagMixing = 0);
 
 	// Rendering audio to a buffer
-	// This is lower-level audio generation, without resource locking, 
-	// so lock by yourself if required
-	void renderFloatNoLock(float* outputStereo, int nStereoSamples, int flagMixing = 0);
+	// Unsafe - not locks resources.
+	void renderFloatUnsafe(float* outputStereo, int nStereoSamples, int flagMixing = 0);
 
-	// Events for playing sounds
-	// It can be called from MIDI player or manually
-	// When calling events from non-audio thread, need to lock resources:
+	//---------------------------------------
+	// Control events
+	//---------------------------------------
+	// It can be called from MIDI player or manually.
+	// Unsafe - not lock resources. When calling events from non-audio thread, 
+	// need to lock resources by calling the following:
 	//    ofxTinyMidiLock lock(soundFont); 
 	// Then inside scope of this "lock" object resources will be locked
-	void channelSetProgramNoLock(int channel /*0..15*/, int program);
-	void noteOnNoLock(int channel, int key, int velocity /*0..127*/);
-	void noteOffNoLock(int channel, int key);
-	void pitchBendNoLock(int channel, int pitchBendNoLock);
-	void controlChangeNoLock(int channel, int control, int controlValue);
+	void channelSetProgramUnsafe(int channel /*0..15*/, int program);
+	void noteOnUnsafe(int channel, int key, int velocity /*0..127*/);
+	void noteOffUnsafe(int channel, int key);
+	void pitchBendUnsafe(int channel, int pitchBendNoLock);
+	void controlChangeUnsafe(int channel, int control, int controlValue);
 
-	// Mutex
-	mutex& mut() { return mutex_; }
 private:
-	bool useMutex_ = true;
+	mutex mutex_;
 	bool loaded_ = false;
-
-	tsf* soundFont_ = nullptr;
-
 	static const int channels_ = 2;
 
-	mutex mutex_;
+	tsf* soundFont_ = nullptr;
 };
 
 
@@ -51,7 +54,7 @@ private:
 // Locks in its visibility area until destroying
 class ofxTinyMidiLock {
 public:
-	ofxTinyMidiLock(mutex& mut): lock_(mut) {}
+	ofxTinyMidiLock(mutex& mut) : lock_(mut) {}
 	ofxTinyMidiLock(ofxTinyMidiSoundFont& soundFont) : lock_(soundFont.mut()) {}
 private:
 	lock_guard<mutex> lock_;
