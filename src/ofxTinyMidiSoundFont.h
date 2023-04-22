@@ -10,6 +10,7 @@ public:
 	void stopAllNotes();	// Stopping all notes
 	
 	string instrumentNameUnsafe(int i);
+	int sampleRate() { return sampleRate_; }
 
 	mutex& mut() { return mutex_; }	// Mutex for locking resources
 
@@ -43,6 +44,7 @@ public:
 
 private:
 	mutex mutex_;
+	int sampleRate_ = 0;
 	bool loaded_ = false;
 	static const int channels_ = 2;
 

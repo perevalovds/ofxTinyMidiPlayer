@@ -46,7 +46,7 @@ void ofxTinyMidiPlayer::play()
 	}
 	ofxTinyMidiLock lock(mutex_);		// Lock own resources
 	playing_ = true;
-	player_message_ = midiPlayer_;	
+	player_message_ = midiPlayer_;
 	player_msec_ = 0;
 }
 
@@ -94,11 +94,13 @@ void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& so
 	ofxTinyMidiLock lockSoundFont(soundFont);	// Lock sound font resources
 
 	// Generate audio by chunks
+	const double SamplesToMilliseconds = 1000.0 / soundFont.sampleRate();
+
 	int sampleCount = output.size() / channels_;
 	float* data = output.getBuffer().data();
-
 	int sampleBlock;
-	for (sampleBlock = chunkSizePerMIDIEvents_; sampleCount > 0; 
+
+	for (sampleBlock = chunkSizePerMIDIEvents_; sampleCount > 0;
 		sampleCount -= sampleBlock, data += sampleBlock * channels_)
 	{
 		//We progress the MIDI playback and then process TSF_RENDER_EFFECTSAMPLEBLOCK samples at once
@@ -106,7 +108,7 @@ void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& so
 
 		//Loop through all MIDI messages which need to be played up until the current playback time
 		auto& msg = player_message_;
-		for (player_msec_ += sampleBlock * (1000.0 / 44100.0); msg && player_msec_ >= msg->time; msg = msg->next)
+		for (player_msec_ += sampleBlock * SamplesToMilliseconds; msg && player_msec_ >= msg->time; msg = msg->next)
 		{
 			if (!msg) {
 				cout << "ofxTinyMidiPlayer::audioOut internal error, mgs == nullptr" << endl;
@@ -115,7 +117,7 @@ void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& so
 			switch (msg->type)
 			{
 			case TML_PROGRAM_CHANGE: //channel program (preset) change (special handling for 10th MIDI channel with drums)
-				soundFont.channelSetProgramUnsafe(msg->channel, msg->program);
+				soundFont.channelSetProgramUnsafe(msg->channel, 0); /// TEST!!!!!!!!!!!! msg->program);
 				break;
 			case TML_NOTE_ON: //play a note
 				soundFont.noteOnUnsafe(msg->channel, msg->key, msg->velocity / 127.0f);

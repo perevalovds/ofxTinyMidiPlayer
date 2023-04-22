@@ -8,6 +8,9 @@ void ofApp::setup() {
 	// Load MIDI file
 	midiPlayer_.load("Joy Division - Transmission.mid");
 
+	soundFont_.channelSetProgramUnsafe(0, 0);
+	soundFont_.noteOnUnsafe(0, 50, 100);
+
 	// Start audio stream
 	setupSoundStream();
 
@@ -73,7 +76,8 @@ void ofApp::audioOut(ofSoundBuffer& output) {
 	}
 
 	int flagMixing = 0;
-	midiPlayer_.audioOut(output, soundFont_, flagMixing);
+	//midiPlayer_.audioOut(output, soundFont_, flagMixing);
+	soundFont_.audioOut(output, flagMixing);
 }
 
 //--------------------------------------------------------------

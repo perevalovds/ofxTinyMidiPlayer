@@ -27,6 +27,7 @@ void ofxTinyMidiSoundFont::load(string sf2_file_name, int sampleRate, float volu
 
 	// Set the SoundFont rendering output mode and volume		
 	tsf_set_output(soundFont_, TSF_STEREO_INTERLEAVED, sampleRate, volumeDb);
+	sampleRate_ = sampleRate;
 }
 
 //--------------------------------------------------------------
@@ -37,6 +38,7 @@ void ofxTinyMidiSoundFont::release()
 		loaded_ = false;
 		tsf_close(soundFont_);
 		soundFont_ = nullptr;
+		sampleRate_ = 0;
 	}
 }
 
