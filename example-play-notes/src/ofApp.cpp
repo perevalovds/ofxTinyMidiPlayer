@@ -7,7 +7,7 @@ void ofApp::setup(){
 
 	// Load sound font
 	float volumeDb = -4;
-	soundFont_.load("gm.sf2", 44100, volumeDb);
+	soundFont_.load("gm.sf2", volumeDb);
 
 	// Choose some instrument
 	setInstrument(currentInstrument_);

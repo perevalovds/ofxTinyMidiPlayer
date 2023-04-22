@@ -15,7 +15,9 @@ No additional installation is required.
 
 ## Examples
 
-Addons comes with three examples.
+Addon comes with examples for playing notes and MIDI files. 
+
+They are based on examples from original TinySoundFont library.
 
 
 ## Supported OS, oF version

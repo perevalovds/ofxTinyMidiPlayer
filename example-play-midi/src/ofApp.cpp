@@ -3,13 +3,13 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
 	// Load sound font
-	soundFont_.load("gm.sf2");
+	float volumeDb = -4;
+	soundFont_.load("gm.sf2", volumeDb);
 
 	// Load MIDI file
-	midiPlayer_.load("Joy Division - Transmission.mid");
-
-	soundFont_.channelSetProgramUnsafe(0, 0);
-	soundFont_.noteOnUnsafe(0, 50, 100);
+	mid_file_name_ = "Joy Division - Transmission.mid";
+	midiPlayer_.load(mid_file_name_);
+	info_ = midiPlayer_.getInfo();
 
 	// Start audio stream
 	setupSoundStream();
@@ -76,13 +76,11 @@ void ofApp::audioOut(ofSoundBuffer& output) {
 	}
 
 	int flagMixing = 0;
-	//midiPlayer_.audioOut(output, soundFont_, flagMixing);
-	soundFont_.audioOut(output, flagMixing);
+	midiPlayer_.audioOut(output, soundFont_, flagMixing);
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
-
 
 }
 
@@ -91,8 +89,9 @@ void ofApp::draw() {
 	ofBackground(64);
 	ofSetColor(255);
 
-	ofDrawBitmapString("Playing MIDI", 30, 30);
-
+	ofDrawBitmapString("Playing MIDI '" + mid_file_name_ + "'", 30, 30);
+	ofDrawBitmapString("Position: " + ofToString(midiPlayer_.getPlayngPositionMilliseconds()/1000)
+		+ " / " + ofToString(info_.time_length_ms / 1000) + " sec", 30, 60);
 }
 
 //--------------------------------------------------------------

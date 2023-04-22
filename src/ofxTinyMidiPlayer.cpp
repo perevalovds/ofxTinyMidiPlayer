@@ -10,6 +10,8 @@ void ofxTinyMidiPlayer::load(string mid_file_name)
 		release();
 	}
 
+	ofxTinyMidiLock lock(mutex_);		// Lock own resources
+
 	mid_file_name = ofToDataPath(mid_file_name);
 	// Load the MIDI from a file
 	auto* midi = tml_load_filename(mid_file_name.c_str());
@@ -20,18 +22,21 @@ void ofxTinyMidiPlayer::load(string mid_file_name)
 		return;
 	}
 	cout << "Loaded MIDI file '" << mid_file_name << "'" << endl;
-	midiPlayer_ = midi;
+	firstMessage_ = midi;
 
-	// TODO read info
+	// Read info
+	tml_get_info(firstMessage_, &info_.used_channels, &info_.used_programs, &info_.total_notes, 
+		&info_.time_first_note, &info_.time_length_ms);
 }
 
 //--------------------------------------------------------------
 void ofxTinyMidiPlayer::release()
 {
 	if (loaded_) {
+		ofxTinyMidiLock lock(mutex_);		// Lock own resources
 		loaded_ = false;
-		tml_free(midiPlayer_);
-		midiPlayer_ = nullptr;
+		tml_free(firstMessage_);
+		firstMessage_ = nullptr;
 	}
 }
 
@@ -46,7 +51,7 @@ void ofxTinyMidiPlayer::play()
 	}
 	ofxTinyMidiLock lock(mutex_);		// Lock own resources
 	playing_ = true;
-	player_message_ = midiPlayer_;
+	player_message_ = firstMessage_;
 	player_msec_ = 0;
 }
 
@@ -96,15 +101,15 @@ void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& so
 	// Generate audio by chunks
 	const double SamplesToMilliseconds = 1000.0 / soundFont.sampleRate();
 
-	int sampleCount = output.size() / channels_;
+	int samplesRemain = output.size() / channels_;
 	float* data = output.getBuffer().data();
 	int sampleBlock;
 
-	for (sampleBlock = chunkSizePerMIDIEvents_; sampleCount > 0;
-		sampleCount -= sampleBlock, data += sampleBlock * channels_)
+	for (sampleBlock = chunkSizePerMIDIEvents_; samplesRemain > 0;
+		samplesRemain -= sampleBlock, data += sampleBlock * channels_)
 	{
 		//We progress the MIDI playback and then process TSF_RENDER_EFFECTSAMPLEBLOCK samples at once
-		if (sampleBlock > sampleCount) sampleBlock = sampleCount;
+		if (sampleBlock > samplesRemain) sampleBlock = samplesRemain;
 
 		//Loop through all MIDI messages which need to be played up until the current playback time
 		auto& msg = player_message_;
@@ -117,13 +122,14 @@ void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& so
 			switch (msg->type)
 			{
 			case TML_PROGRAM_CHANGE: //channel program (preset) change (special handling for 10th MIDI channel with drums)
-				soundFont.channelSetProgramUnsafe(msg->channel, 0); /// TEST!!!!!!!!!!!! msg->program);
+				soundFont.channelSetProgramUnsafe(msg->channel, msg->program);
 				break;
 			case TML_NOTE_ON: //play a note
-				soundFont.noteOnUnsafe(msg->channel, msg->key, msg->velocity / 127.0f);
+				soundFont.noteOnUnsafe(msg->channel, msg->key, msg->velocity);
 				break;
 			case TML_NOTE_OFF: //stop a note
 				soundFont.noteOffUnsafe(msg->channel, msg->key);
+				soundFont.noteOffUnsafe(0, msg->key);
 				break;
 			case TML_PITCH_BEND: //pitch wheel modification
 				soundFont.pitchBendUnsafe(msg->channel, msg->pitch_bend);
@@ -133,11 +139,21 @@ void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& so
 				break;
 			}
 		}
-
 		// Render the block of audio samples in float format
-		soundFont.renderFloatUnsafe(output.getBuffer().data(), sampleCount, flagMixing);
+		soundFont.renderFloatUnsafe(data, sampleBlock, flagMixing);
 	}
 
+}
+
+//--------------------------------------------------------------
+ofxTinyMidiFileInfo ofxTinyMidiPlayer::getInfo()
+{ 
+	if (loaded_) {
+		return info_;
+	}
+	else {
+		return ofxTinyMidiFileInfo();
+	}
 }
 
 //--------------------------------------------------------------

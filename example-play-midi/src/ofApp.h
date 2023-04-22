@@ -33,4 +33,7 @@ private:
 
 	ofxTinyMidiSoundFont soundFont_;
 	ofxTinyMidiPlayer midiPlayer_;
+
+	string mid_file_name_;
+	ofxTinyMidiFileInfo info_;
 };

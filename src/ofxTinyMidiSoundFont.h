@@ -5,7 +5,7 @@
 
 class ofxTinyMidiSoundFont {
 public:
-	void load(string sf2_file_name, int sampleRate = 44100, float volumeDb = 0);
+	void load(string sf2_file_name, float volumeDb = 0, int sampleRate = 44100);
 	void release();			// Free resources
 	void stopAllNotes();	// Stopping all notes
 	
@@ -13,6 +13,8 @@ public:
 	int sampleRate() { return sampleRate_; }
 
 	mutex& mut() { return mutex_; }	// Mutex for locking resources
+
+	bool wasAudioClipping();	// returns if was audio clipping after last call of wasAudioClipping
 
 	//---------------------------------------
 	// Audio
@@ -49,6 +51,8 @@ private:
 	static const int channels_ = 2;
 
 	tsf* soundFont_ = nullptr;
+
+	bool wasAudioClipping_ = false;
 };
 
 

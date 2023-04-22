@@ -4,6 +4,14 @@
 #include "ofxTinyMidiSoundFont.h"
 #include "tml.h"
 
+struct ofxTinyMidiFileInfo {
+	int used_channels = 0;
+	int used_programs = 0;
+	int total_notes = 0;
+	unsigned int time_first_note = 0;
+	unsigned int time_length_ms = 0;
+};
+
 class ofxTinyMidiPlayer {
 public:
 	void load(string mid_file_name);
@@ -12,6 +20,9 @@ public:
 	// Play loaded MIDI file
 	void play();
 	void stop(ofxTinyMidiSoundFont& soundFont);
+
+	ofxTinyMidiFileInfo getInfo();
+	int getPlayngPositionMilliseconds() { return player_msec_; }
 
 	// Audio callback
 	// Safe - locks own and soundFont resources.
@@ -29,13 +40,19 @@ public:
 private:
 	mutex mutex_;
 	bool loaded_ = false;
-	tml_message* midiPlayer_ = nullptr;		// Start of MIDI data represented as a linked list 
+	tml_message* firstMessage_ = nullptr;		// Start of MIDI data represented as a linked list 
 	static const int channels_ = 2;
 
 	bool playing_ = false;
-	tml_message* player_message_ = nullptr;	// Next message to be played
-	double player_msec_ = 0;					// Current playback time
+	tml_message* player_message_ = nullptr;		// Next message to be played
 
+	// Current playback time   
+	// TODO make it std::atomic<double> for safety because of reading it in getPlayngPositionMilliseconds
+	double player_msec_ = 0;		
+	
 	// Settings
 	int chunkSizePerMIDIEvents_ = 64;
+
+	// File Info
+	ofxTinyMidiFileInfo info_;
 };

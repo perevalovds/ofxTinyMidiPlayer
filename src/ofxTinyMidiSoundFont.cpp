@@ -5,7 +5,7 @@
 #include "tsf.h"
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::load(string sf2_file_name, int sampleRate, float volumeDb)
+void ofxTinyMidiSoundFont::load(string sf2_file_name, float volumeDb, int sampleRate)
 {
 	if (loaded_) {
 		release();
@@ -28,6 +28,8 @@ void ofxTinyMidiSoundFont::load(string sf2_file_name, int sampleRate, float volu
 	// Set the SoundFont rendering output mode and volume		
 	tsf_set_output(soundFont_, TSF_STEREO_INTERLEAVED, sampleRate, volumeDb);
 	sampleRate_ = sampleRate;
+
+	wasAudioClipping_ = false;
 }
 
 //--------------------------------------------------------------
@@ -48,6 +50,14 @@ string ofxTinyMidiSoundFont::instrumentNameUnsafe(int i)
 	const char* pName = tsf_get_presetname(soundFont_, i);
 	if (pName) return pName;
 	return "";
+}
+
+//--------------------------------------------------------------
+bool ofxTinyMidiSoundFont::wasAudioClipping()
+{
+	bool clipping = wasAudioClipping_;
+	wasAudioClipping_ = false;
+	return clipping;
 }
 
 //--------------------------------------------------------------
@@ -91,6 +101,13 @@ void ofxTinyMidiSoundFont::renderFloatUnsafe(float* outputStereo, int nStereoSam
 		return;
 	}
 	tsf_render_float(soundFont_, outputStereo, nStereoSamples, flagMixing);
+	
+	// Check audio clipping
+	for (int i = 0; i < nStereoSamples * 2; i++) {
+		if (outputStereo[i] <= -1 || outputStereo[i] >= 1) {
+			wasAudioClipping_ = true;
+		}
+	}
 }
 
 //--------------------------------------------------------------
