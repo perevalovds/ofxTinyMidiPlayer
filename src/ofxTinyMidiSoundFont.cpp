@@ -41,6 +41,14 @@ void ofxTinyMidiSoundFont::release()
 }
 
 //--------------------------------------------------------------
+string ofxTinyMidiSoundFont::instrumentName(int i)
+{
+	const char* pName = tsf_get_presetname(soundFont_, i);
+	if (pName) return pName;
+	return "";
+}
+
+//--------------------------------------------------------------
 void ofxTinyMidiSoundFont::audioOut(ofSoundBuffer& output, int flagMixing)
 {
 	ofxTinyMidiLock locker(mutex_);	// Lock resources - for checking "loaded_" and further

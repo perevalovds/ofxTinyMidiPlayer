@@ -9,6 +9,8 @@ public:
 
 	void release();	// Free resources
 
+	string instrumentName(int i);
+
 	// Generating audio
 	// By default mixing if off, so "replacing" (if 1 then "adding")
 	void audioOut(ofSoundBuffer& output, int flagMixing = 0);

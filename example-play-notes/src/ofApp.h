@@ -34,10 +34,9 @@ private:
 	// ofxTinyMidiPlayer midi_;
 
 	void setInstrument(int instr);
+	int currentInstrument_ = 0;
+
 	void noteOn(int note);
 	void noteOff(int note);
-
-	string instrName;
-
 	vector<int> pressedNotes_; // Flags to prevent multiple presses of a note
 };

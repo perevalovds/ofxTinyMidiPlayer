@@ -9,7 +9,7 @@ void ofApp::setup(){
 	soundFont_.load("gm.sf2");
 
 	// Choose some instrument
-	setInstrument(0);
+	setInstrument(currentInstrument_);
 
 	// Start audio stream
 	setupSoundStream();
@@ -67,7 +67,7 @@ void ofApp::exit() {
 void ofApp::audioOut(ofSoundBuffer& output) {
 	// expected 2 channels
 	if (output.getNumChannels() != 2) {
-		cout << "audioOut - expected stereo buffer to fill" << endl;
+		cout << "audioOut - expected stereo buffer" << endl;
 		return;
 	}
 
@@ -97,6 +97,13 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 	ofBackground(64);
+	ofSetColor(255);
+
+	ofDrawBitmapString("Playing notes with sound font\n\n"
+		"Press 1..9 to play a note\n"
+		"      q..p to change instrument", 30, 30);
+	
+	ofDrawBitmapString("Instrument: " + ofToString(currentInstrument_) + " - " + soundFont_.instrumentName(currentInstrument_), 30, 100);
 	
 }
 
@@ -105,8 +112,7 @@ void ofApp::setInstrument(int instr)
 {
 	ofxTinyMidiLock lock(soundFont_);	// Lock resources
 	soundFont_.channelSetProgram(0, instr);
-
-	// TODO read instrName
+	currentInstrument_ = instr;
 }
 
 //--------------------------------------------------------------
@@ -133,41 +139,40 @@ void ofApp::noteOff(int note)
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-	// 1-9 - change instrument
-	// q..p - play note
-	if (key == '1') setInstrument(0);
-	if (key == '2') setInstrument(1);
-	if (key == '3') setInstrument(2);
-	if (key == '4') setInstrument(3);
-	if (key == '5') setInstrument(4);
-	if (key == '6') setInstrument(5);
-	if (key == '7') setInstrument(6);
-	if (key == '8') setInstrument(7);
-	if (key == '9') setInstrument(8);
-	if (key == 'q') noteOn(50);
-	if (key == 'w') noteOn(52);
-	if (key == 'e') noteOn(54);
-	if (key == 'r') noteOn(55);
-	if (key == 't') noteOn(57);
-	if (key == 'y') noteOn(59);
-	if (key == 'u') noteOn(61);
-	if (key == 'i') noteOn(62);
-	if (key == 'o') noteOn(64);
-	if (key == 'p') noteOn(66);
+	// 1..9 - play note
+	// q..p - change instrument
+	if (key == 'q') setInstrument(0);
+	if (key == 'w') setInstrument(1);
+	if (key == 'e') setInstrument(2);
+	if (key == 'r') setInstrument(3);
+	if (key == 't') setInstrument(4);
+	if (key == 'y') setInstrument(5);
+	if (key == 'u') setInstrument(6);
+	if (key == 'i') setInstrument(7);
+	if (key == 'o') setInstrument(8);
+	if (key == 'p') setInstrument(9);
+	if (key == '1') noteOn(50);
+	if (key == '2') noteOn(52);
+	if (key == '3') noteOn(54);
+	if (key == '4') noteOn(55);
+	if (key == '5') noteOn(57);
+	if (key == '6') noteOn(59);
+	if (key == '7') noteOn(61);
+	if (key == '8') noteOn(62);
+	if (key == '9') noteOn(64);
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-	if (key == 'q') noteOff(50);
-	if (key == 'w') noteOff(52);
-	if (key == 'e') noteOff(54);
-	if (key == 'r') noteOff(55);
-	if (key == 't') noteOff(57);
-	if (key == 'y') noteOff(59);
-	if (key == 'u') noteOff(61);
-	if (key == 'i') noteOff(62);
-	if (key == 'o') noteOff(64);
-	if (key == 'p') noteOff(66);
+	if (key == '1') noteOff(50);
+	if (key == '2') noteOff(52);
+	if (key == '3') noteOff(54);
+	if (key == '4') noteOff(55);
+	if (key == '5') noteOff(57);
+	if (key == '6') noteOff(59);
+	if (key == '7') noteOff(61);
+	if (key == '8') noteOff(62);
+	if (key == '9') noteOff(64);
 }
 
 //--------------------------------------------------------------
