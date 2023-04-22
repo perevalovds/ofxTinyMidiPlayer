@@ -11,9 +11,9 @@ public:
 
 	string instrumentName(int i);
 
-	// Generating audio by playing notes
+	// Audio callback
 	// To generate with MIDI - use ofxTinyMidiPlayer::audioOut
-	// By default mixing if off, so "replacing" (if 1 then "adding")
+	// By default mixing if off, it means replacing values in output (if 1 then adding to output)
 	void audioOut(ofSoundBuffer& output, int flagMixing = 0);
 
 	// Events for playing sounds

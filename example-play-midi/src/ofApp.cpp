@@ -5,6 +5,9 @@ void ofApp::setup() {
 	// Load sound font
 	soundFont_.load("gm.sf2");
 
+	// Load MIDI file
+	midiPlayer_.load("Joy Division - Transmission.mid");
+
 	// Start audio stream
 	setupSoundStream();
 }
@@ -52,6 +55,7 @@ void ofApp::setupSoundStream()
 
 //--------------------------------------------------------------
 void ofApp::exit() {
+	midiPlayer_.release();
 	soundStream_.close();
 	soundFont_.release();
 }
@@ -71,6 +75,9 @@ void ofApp::audioOut(ofSoundBuffer& output) {
 	int n = buffer.size();
 	int nframes = n / output.getNumChannels();
 
+	// We send MIDI events here, 
+	// inside audioOut, by dividing processing on chunks.
+	// It gives best possible performance because no locking resources
 	int flagMixing = 0;
 	soundFont_.audioOut(output, flagMixing);
 

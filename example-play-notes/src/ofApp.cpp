@@ -117,6 +117,10 @@ void ofApp::setInstrument(int instr)
 //--------------------------------------------------------------
 void ofApp::noteOn(int note)
 {
+    // Note: we enable and disable notes by locking resources, 
+    // it's simple, but latency is a large.
+    // For faster performance, implement starting notes right inside 
+    // custom audioOut function as in "example-play-midi" example project.
 	if (!pressedNotes_[note])
 	{
 		pressedNotes_[note] = 1;

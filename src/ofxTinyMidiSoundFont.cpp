@@ -17,16 +17,16 @@ void ofxTinyMidiSoundFont::load(string sf2_file_name, int sampleRate, float volu
 	// Load the SoundFont from a file
 	auto* soundFont = tsf_load_filename(sf2_file_name.c_str());
 	loaded_ = (soundFont != nullptr);
-	if (loaded_) {
-		cout << "Loaded SoundFont '" << sf2_file_name << "'" << endl;
-		soundFont_ = soundFont;
-
-		// Set the SoundFont rendering output mode and volume		
-		tsf_set_output(soundFont_, TSF_STEREO_INTERLEAVED, sampleRate, volumeDb);
-	}
-	else {
+	if (!loaded_)
+	{
 		cout << "Could not load SoundFont " << sf2_file_name << endl;
+		return;
 	}
+	cout << "Loaded SoundFont '" << sf2_file_name << "'" << endl;
+	soundFont_ = soundFont;
+
+	// Set the SoundFont rendering output mode and volume		
+	tsf_set_output(soundFont_, TSF_STEREO_INTERLEAVED, sampleRate, volumeDb);
 }
 
 //--------------------------------------------------------------
@@ -73,8 +73,8 @@ void ofxTinyMidiSoundFont::audioOut(ofSoundBuffer& output, int flagMixing)
 	float* data = buffer.data();
 	int n = buffer.size();
 	int nframes = n / output.getNumChannels();
-	
-	int sampleCount = output.size() / channels_; 
+
+	int sampleCount = output.size() / channels_;
 	tsf_render_float(soundFont_, output.getBuffer().data(), sampleCount, flagMixing);
 }
 
