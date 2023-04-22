@@ -5,20 +5,20 @@
 #include "tsf.h"
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::setup()
-{
-	// TODO load sound font
-	// TODO start audio stream
-}
-
-//--------------------------------------------------------------
 void ofxTinyMidiSoundFont::load(string sf2_file_name, int sampleRate, float volumeDb)
 {
-	// Load the SoundFont from a file
+	if (loaded_) {
+		release();
+	}
+
+	ofxTinyMidiLock locker(mutex_);	// Lock resources
+
 	sf2_file_name = ofToDataPath(sf2_file_name);
+	// Load the SoundFont from a file
 	auto* soundFont = tsf_load_filename(sf2_file_name.c_str());
 	loaded_ = (soundFont != nullptr);
 	if (loaded_) {
+		cout << "Loaded SoundFont '" << sf2_file_name << "'" << endl;
 		soundFont_ = soundFont;
 
 		// Set the SoundFont rendering output mode and volume		
@@ -33,6 +33,7 @@ void ofxTinyMidiSoundFont::load(string sf2_file_name, int sampleRate, float volu
 void ofxTinyMidiSoundFont::release()
 {
 	if (loaded_) {
+		ofxTinyMidiLock locker(mutex_);	// Lock resources
 		loaded_ = false;
 		tsf_close(soundFont_);
 		soundFont_ = nullptr;
@@ -42,6 +43,8 @@ void ofxTinyMidiSoundFont::release()
 //--------------------------------------------------------------
 void ofxTinyMidiSoundFont::audioOut(ofSoundBuffer& output, int flagMixing)
 {
+	ofxTinyMidiLock locker(mutex_);	// Lock resources - for checking "loaded_" and further
+
 	if (!loaded_) {
 		// Fill the output buffer by zeros to avoid random clicks
 		if (!flagMixing) {
@@ -49,8 +52,20 @@ void ofxTinyMidiSoundFont::audioOut(ofSoundBuffer& output, int flagMixing)
 		}
 		return;
 	}
+
+	auto& buffer = output.getBuffer();
+	if (buffer.empty()) return;
+
+	if (output.getNumChannels() != channels_) {
+		cout << "ofxTinyMidiSoundFont::audioOut error: expected " << channels_ << " channels in the buffer" << endl;
+		output.set(0);
+		return;
+	}
+
+	float* data = buffer.data();
+	int n = buffer.size();
+	int nframes = n / output.getNumChannels();
 	
-	ofxTinyMidiLock locker(mutex_);	// Lock resources
 	int sampleCount = output.size() / channels_; 
 	tsf_render_float(soundFont_, output.getBuffer().data(), sampleCount, flagMixing);
 }

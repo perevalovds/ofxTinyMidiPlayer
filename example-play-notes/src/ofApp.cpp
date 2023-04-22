@@ -3,12 +3,89 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+	pressedNotes_.resize(128);
 
+	// Load sound font
+	soundFont_.load("gm.sf2");
+
+	// Choose some instrument
+	setInstrument(0);
+
+	// Start audio stream
+	setupSoundStream();
 }
 
 //--------------------------------------------------------------
+void ofApp::setupSoundStream()
+{
+	// Api: 
+	// DEFAULT
+	// MS_WASAPI /*!< The Microsoft WASAPI API. */
+	// MS_ASIO   /*!< The Steinberg Audio Stream I/O API. */
+	// MS_DS     /*!< The Microsoft Direct Sound API. */
+
+	ofSoundDevice::Api API = //ofSoundDevice::Api::MS_ASIO  // Use this for ASIO sound card for the better responsibilty, SR 44100, buffer 64, buffers 2
+							ofSoundDevice::Api::MS_DS;  // Use this for internal sound card, then need buffer 128, buffers 4
+
+	auto devices = soundStream_.getDeviceList(API);
+	//auto devices = soundStream_.getMatchingDevices("default");
+	cout << devices << endl;
+	if (devices.empty()) {
+		cout << "No sound devices" << endl;
+	}
+	else {
+
+		//settings.setInDevice(devices[0]);
+		auto& device = devices[0];
+		if (device.outputChannels == 0 && device.sampleRates.empty()) {
+			ofSystemAlertDialog("Can't initialize output device " + device.name);
+			_exit(0);
+		}
+
+		ofSoundStreamSettings settings;
+		settings.setApi(API);
+		settings.setOutDevice(device);
+
+		settings.setOutListener(this);
+		settings.sampleRate = 44100;
+		settings.numOutputChannels = device.outputChannels;
+		settings.numInputChannels = 0; //device.inputChannels;
+		settings.bufferSize = 512;
+		settings.numBuffers = 4;
+		soundStream_.setup(settings);
+	}
+}
+
+
+//--------------------------------------------------------------
 void ofApp::exit() {
-	
+	soundStream_.close();
+	soundFont_.release();
+}
+
+//--------------------------------------------------------------
+void ofApp::audioOut(ofSoundBuffer& output) {
+	// expected 2 channels
+	if (output.getNumChannels() != 2) {
+		cout << "audioOut - expected stereo buffer to fill" << endl;
+		return;
+	}
+
+	auto& buffer = output.getBuffer();
+	if (buffer.empty()) return;
+
+	float* data = buffer.data();
+	int n = buffer.size();
+	int nframes = n / output.getNumChannels();
+
+	int flagMixing = 0;
+	soundFont_.audioOut(output, flagMixing);
+	// Apply compression and final volume
+	// for (int k = 0; k < n; k++) {
+	//	 float& v = data[k];
+	//	 v *= Volume;
+	// }
+
 }
 
 //--------------------------------------------------------------
@@ -35,15 +112,23 @@ void ofApp::setInstrument(int instr)
 //--------------------------------------------------------------
 void ofApp::noteOn(int note)
 {
-	ofxTinyMidiLock lock(soundFont_);	// Lock resources
-	soundFont_.noteOn(0, note, 127);
+	if (!pressedNotes_[note])
+	{
+		pressedNotes_[note] = 1;
+		ofxTinyMidiLock lock(soundFont_);	// Lock resources
+		soundFont_.noteOn(0, note, 127);
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::noteOff(int note)
 {
-	ofxTinyMidiLock lock(soundFont_);	// Lock resources
-	soundFont_.noteOff(0, note);
+	if (pressedNotes_[note])
+	{
+		pressedNotes_[note] = 0;
+		ofxTinyMidiLock lock(soundFont_);	// Lock resources
+		soundFont_.noteOff(0, note);
+	}
 }
 
 //--------------------------------------------------------------

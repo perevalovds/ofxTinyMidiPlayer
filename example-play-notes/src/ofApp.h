@@ -24,12 +24,20 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
+	void audioOut(ofSoundBuffer& output);
+
+private:
+	ofSoundStream soundStream_;
+	void setupSoundStream();
+
 	ofxTinyMidiSoundFont soundFont_;
-	ofxTinyMidiPlayer midi_;
+	// ofxTinyMidiPlayer midi_;
 
 	void setInstrument(int instr);
 	void noteOn(int note);
 	void noteOff(int note);
 
 	string instrName;
+
+	vector<int> pressedNotes_; // Flags to prevent multiple presses of a note
 };

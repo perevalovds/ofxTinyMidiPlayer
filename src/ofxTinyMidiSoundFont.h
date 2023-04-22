@@ -5,7 +5,6 @@
 
 class ofxTinyMidiSoundFont {
 public:
-	void setup(); 
 	void load(string sf2_file_name, int sampleRate = 44100, float volumeDb = 0);
 
 	void release();	// Free resources
