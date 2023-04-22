@@ -36,4 +36,5 @@ private:
 
 	string mid_file_name_;
 	ofxTinyMidiFileInfo info_;
+	bool wasClipping_ = false;
 };

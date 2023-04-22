@@ -2,8 +2,10 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
+	ofSetFrameRate(60);
+
 	// Load sound font
-	float volumeDb = -4;
+	float volumeDb = -4;	// Volume - decrease if audio clipping occurs
 	soundFont_.load("gm.sf2", volumeDb);
 
 	// Load MIDI file
@@ -81,7 +83,10 @@ void ofApp::audioOut(ofSoundBuffer& output) {
 
 //--------------------------------------------------------------
 void ofApp::update() {
-
+	// Monitoring audio clipping
+	if (ofGetFrameNum() % 30 == 0) {
+		wasClipping_ = wasClipping_ || soundFont_.wasAudioClipping();
+	}
 }
 
 //--------------------------------------------------------------
@@ -92,6 +97,14 @@ void ofApp::draw() {
 	ofDrawBitmapString("Playing MIDI '" + mid_file_name_ + "'", 30, 30);
 	ofDrawBitmapString("Position: " + ofToString(midiPlayer_.getPlayngPositionMilliseconds()/1000)
 		+ " / " + ofToString(info_.time_length_ms / 1000) + " sec", 30, 60);
+
+	// Audio clipping monitor
+	if (!wasClipping_) {
+		ofDrawBitmapStringHighlight("No audio clipping", 30, 90, ofColor(0, 0), ofColor(255));
+	}
+	else {
+		ofDrawBitmapStringHighlight("Audio clipping was detected. Consider to decrease volumeDb", 30, 90, ofColor(0, 0), ofColor(255, 64, 64));
+	}
 }
 
 //--------------------------------------------------------------

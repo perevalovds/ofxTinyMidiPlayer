@@ -6,8 +6,8 @@ void ofApp::setup(){
 	pressedNotes_.resize(128);
 
 	// Load sound font
-	float volumeDb = -4;
-	soundFont_.load("gm.sf2", volumeDb);
+	float volumeDb = -4; 
+	soundFont_.load("gm.sf2", volumeDb); 	// Volume - decrease if audio clipping occurs. See soundFont_.wasAudioClipping() and example-play-midi
 
 	// Choose some instrument
 	setInstrument(currentInstrument_);
