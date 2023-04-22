@@ -98,7 +98,7 @@ void ofApp::draw() {
 	ofDrawBitmapString("Position: " + ofToString(midiPlayer_.getPlayngPositionMilliseconds()/1000)
 		+ " / " + ofToString(info_.time_length_ms / 1000) + " sec", 30, 60);
 
-	// Audio clipping monitor
+	// Audio clipping monitoring
 	if (!wasClipping_) {
 		ofDrawBitmapStringHighlight("No audio clipping", 30, 90, ofColor(0, 0), ofColor(255));
 	}
