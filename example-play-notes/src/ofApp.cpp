@@ -68,30 +68,16 @@ void ofApp::exit() {
 void ofApp::audioOut(ofSoundBuffer& output) {
 	// expected 2 channels
 	if (output.getNumChannels() != 2) {
-		cout << "audioOut - expected stereo buffer" << endl;
+		cout << "ofApp::audioOut - expected stereo buffer" << endl;
 		return;
 	}
 
-	auto& buffer = output.getBuffer();
-	if (buffer.empty()) return;
-
-	float* data = buffer.data();
-	int n = buffer.size();
-	int nframes = n / output.getNumChannels();
-
 	int flagMixing = 0;
 	soundFont_.audioOut(output, flagMixing);
-    
-	// Change volume if required
-	// for (int k = 0; k < n; k++) {
-	//	 float& v = data[k];
-	//	 v *= volume;
-	// }
-}
+ }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	
 
 }
 
@@ -105,14 +91,13 @@ void ofApp::draw(){
 		"      q..p to change instrument", 30, 30);
 	
 	ofDrawBitmapString("Instrument: " + ofToString(currentInstrument_) + " - " + soundFont_.instrumentName(currentInstrument_), 30, 100);
-	
 }
 
 //--------------------------------------------------------------
 void ofApp::setInstrument(int instr)
 {
 	ofxTinyMidiLock lock(soundFont_);	// Lock resources
-	soundFont_.channelSetProgram(0, instr);
+	soundFont_.channelSetProgramNoLock(0, instr);
 	currentInstrument_ = instr;
 }
 
@@ -128,7 +113,7 @@ void ofApp::noteOn(int note)
 		pressedNotes_[note] = 1;
 		ofxTinyMidiLock lock(soundFont_);	// Lock resources
 		int velocity = 100;	// Maximum 127
-		soundFont_.noteOn(0, note, velocity);
+		soundFont_.noteOnNoLock(0, note, velocity);
 	}
 }
 
@@ -139,7 +124,7 @@ void ofApp::noteOff(int note)
 	{
 		pressedNotes_[note] = 0;
 		ofxTinyMidiLock lock(soundFont_);	// Lock resources
-		soundFont_.noteOff(0, note);
+		soundFont_.noteOffNoLock(0, note);
 	}
 }
 

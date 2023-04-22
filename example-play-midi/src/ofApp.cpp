@@ -68,28 +68,12 @@ void ofApp::exit() {
 void ofApp::audioOut(ofSoundBuffer& output) {
 	// expected 2 channels
 	if (output.getNumChannels() != 2) {
-		cout << "audioOut - expected stereo buffer" << endl;
+		cout << "ofApp::audioOut - expected stereo buffer" << endl;
 		return;
 	}
 
-	auto& buffer = output.getBuffer();
-	if (buffer.empty()) return;
-
-	float* data = buffer.data();
-	int n = buffer.size();
-	int nframes = n / output.getNumChannels();
-
-	// We send MIDI events here, 
-	// inside audioOut, by dividing processing on chunks.
-	// It gives best possible performance because no locking resources
 	int flagMixing = 0;
-	soundFont_.audioOut(output, flagMixing);
-
-	// Change volume if required
-	// for (int k = 0; k < n; k++) {
-	//	 float& v = data[k];
-	//	 v *= volume;
-	// }
+	midiPlayer_.audioOut(output, flagMixing);
 }
 
 //--------------------------------------------------------------

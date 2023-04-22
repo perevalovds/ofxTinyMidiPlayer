@@ -20,18 +20,18 @@ public:
 	// Rendering audio to a buffer
 	// This is lower-level audio generation, without resource locking, 
 	// so lock by yourself if required
-	void renderFloat(float* outputStereo, int nStereoSamples, int flagMixing = 0);
+	void renderFloatNoLock(float* outputStereo, int nStereoSamples, int flagMixing = 0);
 
 	// Events for playing sounds
 	// It can be called from MIDI player or manually
 	// When calling events from non-audio thread, need to lock resources:
 	//    ofxTinyMidiLock lock(soundFont); 
 	// Then inside scope of this "lock" object resources will be locked
-	void channelSetProgram(int channel /*0..15*/, int program);
-	void noteOn(int channel, int key, int velocity /*0..127*/);
-	void noteOff(int channel, int key);
-	void pitchBend(int channel, int pitchBend);
-	void controlChange(int channel, int control, int controlValue);
+	void channelSetProgramNoLock(int channel /*0..15*/, int program);
+	void noteOnNoLock(int channel, int key, int velocity /*0..127*/);
+	void noteOffNoLock(int channel, int key);
+	void pitchBendNoLock(int channel, int pitchBendNoLock);
+	void controlChangeNoLock(int channel, int control, int controlValue);
 
 	// Mutex
 	mutex& mut() { return mutex_; }

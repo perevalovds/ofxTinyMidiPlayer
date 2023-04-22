@@ -48,9 +48,33 @@ void ofxTinyMidiPlayer::stop()
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, int flagMixing)
+void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& soundFont, int flagMixing)
 {
+	if (!loaded_) {
+		// Fill the output buffer by zeros to avoid random clicks
+		if (!flagMixing) {
+			output.set(0);
+		}
+		return;
+	}
 
+	ofxTinyMidiLock lock(soundFont);	// Lock resources
+
+	auto& buffer = output.getBuffer();
+	if (buffer.empty()) return;
+
+	if (output.getNumChannels() != channels_) {
+		cout << "ofxTinyMidiPlayer::audioOut error: expected " << channels_ << " channels in the buffer" << endl;
+		output.set(0);
+		return;
+	}
+
+	float* data = buffer.data();
+	int n = buffer.size();
+	int nframes = n / channels_;
+
+	int sampleCount = output.size() / channels_;
+	//renderFloatNoLock(output.getBuffer().data(), sampleCount, flagMixing);
 }
 
 

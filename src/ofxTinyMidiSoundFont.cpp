@@ -70,29 +70,30 @@ void ofxTinyMidiSoundFont::audioOut(ofSoundBuffer& output, int flagMixing)
 		return;
 	}
 
-	float* data = buffer.data();
-	int n = buffer.size();
-	int nframes = n / output.getNumChannels();
-
 	int sampleCount = output.size() / channels_;
-	renderFloat(output.getBuffer().data(), sampleCount, flagMixing);
+	renderFloatNoLock(output.getBuffer().data(), sampleCount, flagMixing);
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::renderFloat(float* outputStereo, int nStereoSamples, int flagMixing)
+void ofxTinyMidiSoundFont::renderFloatNoLock(float* outputStereo, int nStereoSamples, int flagMixing)
 {
-	if (!loaded_) {
+	if (!outputStereo) {
+		cout << "ofxTinyMidiSoundFont::renderFloatNoLock - null outputStereo" << endl;
 		return;
 	}
-	if (!outputStereo) {
-		cout << "ofxTinyMidiSoundFont::renderFloat - null outputStereo" << endl;
+	if (!loaded_) {
+		if (!flagMixing) {
+			for (int i = 0; i < nStereoSamples * 2; i++) {
+				outputStereo[i] = 0.0f;
+			}
+		}
 		return;
 	}
 	tsf_render_float(soundFont_, outputStereo, nStereoSamples, flagMixing);
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::channelSetProgram(int channel, int program)
+void ofxTinyMidiSoundFont::channelSetProgramNoLock(int channel, int program)
 {
 	if (!loaded_) {
 		return;
@@ -102,7 +103,7 @@ void ofxTinyMidiSoundFont::channelSetProgram(int channel, int program)
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::noteOn(int channel, int key, int velocity)
+void ofxTinyMidiSoundFont::noteOnNoLock(int channel, int key, int velocity)
 {
 	if (!loaded_) {
 		return;
@@ -111,7 +112,7 @@ void ofxTinyMidiSoundFont::noteOn(int channel, int key, int velocity)
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::noteOff(int channel, int key)
+void ofxTinyMidiSoundFont::noteOffNoLock(int channel, int key)
 {
 	if (!loaded_) {
 		return;
@@ -120,16 +121,16 @@ void ofxTinyMidiSoundFont::noteOff(int channel, int key)
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::pitchBend(int channel, int pitchBend)
+void ofxTinyMidiSoundFont::pitchBendNoLock(int channel, int pitchBendNoLock)
 {
 	if (!loaded_) {
 		return;
 	}
-	tsf_channel_set_pitchwheel(soundFont_, channel, pitchBend);
+	tsf_channel_set_pitchwheel(soundFont_, channel, pitchBendNoLock);
 }
 
 //--------------------------------------------------------------
-void ofxTinyMidiSoundFont::controlChange(int channel, int control, int controlValue)
+void ofxTinyMidiSoundFont::controlChangeNoLock(int channel, int control, int controlValue)
 {
 	if (!loaded_) {
 		return;
