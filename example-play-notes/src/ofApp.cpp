@@ -6,7 +6,8 @@ void ofApp::setup(){
 	pressedNotes_.resize(128);
 
 	// Load sound font
-	soundFont_.load("gm.sf2");
+	float volumeDb = -4;
+	soundFont_.load("gm.sf2", 44100, volumeDb);
 
 	// Choose some instrument
 	setInstrument(currentInstrument_);
@@ -18,6 +19,7 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::setupSoundStream()
 {
+    cout << "Starting audio output" << endl;
 	// Api: 
 	// DEFAULT
 	// MS_WASAPI /*!< The Microsoft WASAPI API. */
@@ -125,7 +127,8 @@ void ofApp::noteOn(int note)
 	{
 		pressedNotes_[note] = 1;
 		ofxTinyMidiLock lock(soundFont_);	// Lock resources
-		soundFont_.noteOn(0, note, 127);
+		int velocity = 100;	// Maximum 127
+		soundFont_.noteOn(0, note, velocity);
 	}
 }
 

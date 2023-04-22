@@ -12,13 +12,19 @@ public:
 	string instrumentName(int i);
 
 	// Audio callback
-	// To generate with MIDI - use ofxTinyMidiPlayer::audioOut
+	// This is higher-level audio generation, with resource locking
+	// To generate with MIDI - use ofxTinyMidiPlayer::audioOut with 
 	// By default mixing if off, it means replacing values in output (if 1 then adding to output)
 	void audioOut(ofSoundBuffer& output, int flagMixing = 0);
 
+	// Rendering audio to a buffer
+	// This is lower-level audio generation, without resource locking, 
+	// so lock by yourself if required
+	void renderFloat(float* outputStereo, int nStereoSamples, int flagMixing = 0);
+
 	// Events for playing sounds
 	// It can be called from MIDI player or manually
-	// When calling events from non-audio thread, declare 
+	// When calling events from non-audio thread, need to lock resources:
 	//    ofxTinyMidiLock lock(soundFont); 
 	// Then inside scope of this "lock" object resources will be locked
 	void channelSetProgram(int channel /*0..15*/, int program);

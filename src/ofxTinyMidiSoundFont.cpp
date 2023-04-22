@@ -75,7 +75,20 @@ void ofxTinyMidiSoundFont::audioOut(ofSoundBuffer& output, int flagMixing)
 	int nframes = n / output.getNumChannels();
 
 	int sampleCount = output.size() / channels_;
-	tsf_render_float(soundFont_, output.getBuffer().data(), sampleCount, flagMixing);
+	renderFloat(output.getBuffer().data(), sampleCount, flagMixing);
+}
+
+//--------------------------------------------------------------
+void ofxTinyMidiSoundFont::renderFloat(float* outputStereo, int nStereoSamples, int flagMixing)
+{
+	if (!loaded_) {
+		return;
+	}
+	if (!outputStereo) {
+		cout << "ofxTinyMidiSoundFont::renderFloat - null outputStereo" << endl;
+		return;
+	}
+	tsf_render_float(soundFont_, outputStereo, nStereoSamples, flagMixing);
 }
 
 //--------------------------------------------------------------

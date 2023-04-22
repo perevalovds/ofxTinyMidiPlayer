@@ -10,11 +10,15 @@ void ofApp::setup() {
 
 	// Start audio stream
 	setupSoundStream();
+
+	// Start playing MIDI
+	midiPlayer_.play();
 }
 
 //--------------------------------------------------------------
 void ofApp::setupSoundStream()
 {
+	cout << "Starting audio output" << endl;
 	// Api: 
 	// DEFAULT
 	// MS_WASAPI /*!< The Microsoft WASAPI API. */
