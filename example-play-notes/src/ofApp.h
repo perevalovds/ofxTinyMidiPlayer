@@ -3,7 +3,6 @@
 #include "ofMain.h"
 #include "ofxTinyMidiPlayer.h"
 
-
 class ofApp : public ofBaseApp {
 
 public:
@@ -31,7 +30,6 @@ private:
 	void setupSoundStream();
 
 	ofxTinyMidiSoundFont soundFont_;
-	// ofxTinyMidiPlayer midi_;
 
 	void setInstrument(int instr);
 	int currentInstrument_ = 0;

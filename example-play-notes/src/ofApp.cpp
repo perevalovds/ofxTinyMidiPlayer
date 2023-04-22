@@ -56,7 +56,6 @@ void ofApp::setupSoundStream()
 	}
 }
 
-
 //--------------------------------------------------------------
 void ofApp::exit() {
 	soundStream_.close();
@@ -80,12 +79,12 @@ void ofApp::audioOut(ofSoundBuffer& output) {
 
 	int flagMixing = 0;
 	soundFont_.audioOut(output, flagMixing);
-	// Apply compression and final volume
+    
+	// Change volume if required
 	// for (int k = 0; k < n; k++) {
 	//	 float& v = data[k];
-	//	 v *= Volume;
+	//	 v *= volume;
 	// }
-
 }
 
 //--------------------------------------------------------------

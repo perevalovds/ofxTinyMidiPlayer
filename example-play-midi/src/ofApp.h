@@ -3,7 +3,6 @@
 #include "ofMain.h"
 #include "ofxTinyMidiPlayer.h"
 
-
 class ofApp : public ofBaseApp {
 
 public:
@@ -24,6 +23,12 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
+	void audioOut(ofSoundBuffer& output);
 
-	ofxTinyMidiPlayer midi_;
+private:
+	ofSoundStream soundStream_;
+	void setupSoundStream();
+
+	ofxTinyMidiSoundFont soundFont_;
+	ofxTinyMidiPlayer midiPlayer_;
 };

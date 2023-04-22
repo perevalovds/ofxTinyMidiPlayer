@@ -11,12 +11,14 @@ public:
 
 	string instrumentName(int i);
 
-	// Generating audio
+	// Generating audio by playing notes
+	// To generate with MIDI - use ofxTinyMidiPlayer::audioOut
 	// By default mixing if off, so "replacing" (if 1 then "adding")
 	void audioOut(ofSoundBuffer& output, int flagMixing = 0);
 
-	// Midi events
-	// When calling midi events from non-audio thread, declare 
+	// Events for playing sounds
+	// It can be called from MIDI player or manually
+	// When calling events from non-audio thread, declare 
 	//    ofxTinyMidiLock lock(soundFont); 
 	// Then inside scope of this "lock" object resources will be locked
 	void channelSetProgram(int channel /*0..15*/, int program);
@@ -36,9 +38,7 @@ private:
 	static const int channels_ = 2;
 
 	mutex mutex_;
-
 };
-
 
 
 // Conditional locker, enables mutex if required
