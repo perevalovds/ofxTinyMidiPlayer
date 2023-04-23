@@ -83,7 +83,7 @@ void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& so
 	}
 
 	if (output.getNumChannels() != audioChannels_) {
-		cout << "ofxTinyMidiPlayer::audioOut error: expected " << channels_ << " channels in the buffer" << endl;
+		cout << "ofxTinyMidiPlayer::audioOut error: expected " << audioChannels_ << " channels in the buffer" << endl;
 		output.set(0);
 		return;
 	}
@@ -101,12 +101,12 @@ void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& so
 	// Generate audio by chunks
 	const double SamplesToMilliseconds = 1000.0 / soundFont.sampleRate();
 
-	int samplesRemain = output.size() / channels_;
+	int samplesRemain = output.size() / audioChannels_;
 	float* data = output.getBuffer().data();
 	int sampleBlock;
 
 	for (sampleBlock = chunkSizePerMIDIEvents_; samplesRemain > 0;
-		samplesRemain -= sampleBlock, data += sampleBlock * channels_)
+		samplesRemain -= sampleBlock, data += sampleBlock * audioChannels_)
 	{
 		//We progress the MIDI playback and then process TSF_RENDER_EFFECTSAMPLEBLOCK samples at once
 		if (sampleBlock > samplesRemain) sampleBlock = samplesRemain;
