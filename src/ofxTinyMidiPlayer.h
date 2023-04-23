@@ -18,7 +18,7 @@ public:
 	void release();	// Free resources
 
 	// Play loaded MIDI file
-	void play();
+	virtual void play();
 	void stop(ofxTinyMidiSoundFont& soundFont);
 
 	ofxTinyMidiFileInfo getInfo();
@@ -37,7 +37,7 @@ public:
 
 	// Mutex
 	mutex& mut() { return mutex_; }
-private:
+protected:
 	mutex mutex_;
 	bool loaded_ = false;
 	tml_message* firstMessage_ = nullptr;		// Start of MIDI data represented as a linked list 

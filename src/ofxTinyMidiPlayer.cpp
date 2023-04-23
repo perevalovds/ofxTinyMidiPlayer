@@ -129,7 +129,6 @@ void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& so
 				break;
 			case TML_NOTE_OFF: //stop a note
 				soundFont.noteOffUnsafe(msg->channel, msg->key);
-				soundFont.noteOffUnsafe(0, msg->key);
 				break;
 			case TML_PITCH_BEND: //pitch wheel modification
 				soundFont.pitchBendUnsafe(msg->channel, msg->pitch_bend);
