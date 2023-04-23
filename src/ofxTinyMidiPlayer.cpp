@@ -82,7 +82,7 @@ void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& so
 		return;
 	}
 
-	if (output.getNumChannels() != channels_) {
+	if (output.getNumChannels() != audioChannels_) {
 		cout << "ofxTinyMidiPlayer::audioOut error: expected " << channels_ << " channels in the buffer" << endl;
 		output.set(0);
 		return;

@@ -48,7 +48,7 @@ private:
 	mutex mutex_;
 	int sampleRate_ = 0;
 	bool loaded_ = false;
-	static const int channels_ = 2;
+	static const int audioChannels_ = 2;
 
 	tsf* soundFont_ = nullptr;
 

@@ -41,7 +41,7 @@ protected:
 	mutex mutex_;
 	bool loaded_ = false;
 	tml_message* firstMessage_ = nullptr;		// Start of MIDI data represented as a linked list 
-	static const int channels_ = 2;
+	static const int audioChannels_ = 2;
 
 	bool playing_ = false;
 	tml_message* player_message_ = nullptr;		// Next message to be played

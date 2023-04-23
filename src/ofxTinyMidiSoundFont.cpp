@@ -75,13 +75,13 @@ void ofxTinyMidiSoundFont::audioOut(ofSoundBuffer& output, int flagMixing)
 
 	if (output.size() == 0) return;
 
-	if (output.getNumChannels() != channels_) {
-		cout << "ofxTinyMidiSoundFont::audioOut error: expected " << channels_ << " channels in the buffer" << endl;
+	if (output.getNumChannels() != audioChannels_) {
+		cout << "ofxTinyMidiSoundFont::audioOut error: expected " << audioChannels_ << " channels in the buffer" << endl;
 		output.set(0);
 		return;
 	}
 
-	int sampleCount = output.size() / channels_;
+	int sampleCount = output.size() / audioChannels_;
 	renderFloatUnsafe(output.getBuffer().data(), sampleCount, flagMixing);
 }
 
