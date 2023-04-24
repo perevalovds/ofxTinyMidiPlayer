@@ -115,10 +115,6 @@ void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& so
 		auto& msg = player_message_;
 		for (player_msec_ += sampleBlock * SamplesToMilliseconds; msg && player_msec_ >= msg->time; msg = msg->next)
 		{
-			if (!msg) {
-				cout << "ofxTinyMidiPlayer::audioOut internal error, mgs == nullptr" << endl;
-				return;
-			}
 			switch (msg->type)
 			{
 			case TML_PROGRAM_CHANGE: //channel program (preset) change (special handling for 10th MIDI channel with drums)
