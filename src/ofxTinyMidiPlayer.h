@@ -22,7 +22,7 @@ public:
 	void stop(ofxTinyMidiSoundFont& soundFont);
 
 	ofxTinyMidiFileInfo getInfo();
-	int getPlayngPositionMilliseconds() { return player_msec_; }
+	int getPlayngPositionMilliseconds();
 
 	// Audio callback
 	// Safe - locks own and soundFont resources.

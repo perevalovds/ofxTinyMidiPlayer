@@ -112,8 +112,9 @@ void ofxTinyMidiPlayer::audioOut(ofSoundBuffer& output, ofxTinyMidiSoundFont& so
 		if (sampleBlock > samplesRemain) sampleBlock = samplesRemain;
 
 		//Loop through all MIDI messages which need to be played up until the current playback time
+		player_msec_ += sampleBlock * SamplesToMilliseconds;
 		auto& msg = player_message_;
-		for (player_msec_ += sampleBlock * SamplesToMilliseconds; msg && player_msec_ >= msg->time; msg = msg->next)
+		for (; msg && player_msec_ >= msg->time; msg = msg->next)
 		{
 			switch (msg->type)
 			{
@@ -149,6 +150,11 @@ ofxTinyMidiFileInfo ofxTinyMidiPlayer::getInfo()
 	else {
 		return ofxTinyMidiFileInfo();
 	}
+}
+
+//--------------------------------------------------------------
+int ofxTinyMidiPlayer::getPlayngPositionMilliseconds() {
+	return player_msec_; 
 }
 
 //--------------------------------------------------------------
